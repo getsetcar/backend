@@ -32,6 +32,7 @@ func main() {
 			"message": "Welcome to GetSetCar API",
 		})
 	})
+	app.Get("/all-brands", carHandler.GetAllBrands)
 	app.Get("/cars/:brand", carHandler.GetCarsForBrand)
 	app.Get("/cars/:brand/:model", carHandler.GetModel)
 

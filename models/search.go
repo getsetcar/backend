@@ -1,5 +1,10 @@
 package models
 
+type AllBrandsResponse struct {
+	Brand string `json:"brand"`
+	Logo  string `json:"logo"`
+}
+
 type BrandSearchResponse struct {
 	VariantName string `json:"variantName"`
 	Image       string `json:"image"`

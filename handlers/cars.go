@@ -6,7 +6,10 @@ import (
 	"getsetcar/models"
 	"getsetcar/utils"
 	"github.com/gofiber/fiber/v2"
+	"strings"
 )
+
+const StorageBrandLogosPath = "https://storage.googleapis.com/gsc-logos/brand-logos/"
 
 type CarHandler struct {
 	CarsData models.CarData
@@ -51,6 +54,31 @@ func (h *CarHandler) GetModel(c *fiber.Ctx) error {
 	allModelsOfBrand := brands[carBrand]
 	c.Status(fiber.StatusOK)
 	return c.JSON(allModelsOfBrand.Models[carModel])
+}
+
+func (h *CarHandler) GetAllBrands(c *fiber.Ctx) error {
+	var response []models.AllBrandsResponse
+	var onlyBrandNames []string
+	for brandName, _ := range h.CarsData.Brands {
+		brandName = strings.Replace(brandName, "-cars", "", 1)
+		logoPath := fmt.Sprintf("%s.jpg", StorageBrandLogosPath+brandName)
+		brandName = formatBrandName(brandName)
+		response = append(response, models.AllBrandsResponse{
+			Brand: brandName,
+			Logo:  logoPath,
+		})
+		onlyBrandNames = append(onlyBrandNames, brandName)
+	}
+	c.Status(fiber.StatusOK)
+	return c.JSON(response)
+}
+
+func formatBrandName(input string) string {
+	words := strings.Split(input, "-")
+	for i, word := range words {
+		words[i] = strings.Title(word)
+	}
+	return strings.Join(words, " ")
 }
 
 func getMainImage(images []models.Image) (models.Image, error) {
