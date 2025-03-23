@@ -51,7 +51,8 @@ func (h *CarHandler) GetModel(c *fiber.Ctx) error {
 	brands := h.CarsData.Brands
 	allModelsOfBrand := brands[carBrand]
 	allVariants := allModelsOfBrand.Models[carModel].Variants
-	var response []map[string]interface{}
+	var response map[string]interface{}
+	variants := make([]map[string]interface{}, 0)
 	for variantName, value := range allVariants {
 		variantResponse := map[string]interface{}{
 			"variant_name":   variantName,
@@ -60,7 +61,11 @@ func (h *CarHandler) GetModel(c *fiber.Ctx) error {
 			"city_price":     value.CityPrices,
 			"colors":         value.Colors,
 		}
-		response = append(response, variantResponse)
+		variants = append(variants, variantResponse)
+	}
+	response = map[string]interface{}{
+		"variants": variants,
+		"images":   allModelsOfBrand.Models[carModel].Images,
 	}
 	c.Status(fiber.StatusOK)
 	return c.JSON(response)
