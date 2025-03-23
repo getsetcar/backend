@@ -26,9 +26,7 @@ func (h *CarHandler) GetCarsForBrand(c *fiber.Ctx) error {
 	param = param + "-cars"
 	var response []models.BrandSearchResponse
 	for brand, carModels := range h.CarsData.Brands {
-		//fmt.Println(brand)
 		if brand == param {
-			PrettyPrint(carModels.Models)
 			for variantName, car := range carModels.Models {
 				mainImage, err := getMainImage(car.Images)
 				if err != nil {
@@ -52,8 +50,20 @@ func (h *CarHandler) GetModel(c *fiber.Ctx) error {
 	carModel := c.Params("model")
 	brands := h.CarsData.Brands
 	allModelsOfBrand := brands[carBrand]
+	allVariants := allModelsOfBrand.Models[carModel].Variants
+	var response []map[string]interface{}
+	for variantName, value := range allVariants {
+		variantResponse := map[string]interface{}{
+			"variant_name":   variantName,
+			"specifications": value.Specifications,
+			"basic_price":    value.BasicPrice,
+			"city_price":     value.CityPrices,
+			"colors":         value.Colors,
+		}
+		response = append(response, variantResponse)
+	}
 	c.Status(fiber.StatusOK)
-	return c.JSON(allModelsOfBrand.Models[carModel])
+	return c.JSON(response)
 }
 
 func (h *CarHandler) GetAllBrands(c *fiber.Ctx) error {
